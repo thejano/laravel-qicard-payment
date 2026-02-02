@@ -4,8 +4,7 @@ namespace TheJano\QiCardPayment\Services;
 
 use Illuminate\Support\Facades\Http;
 use TheJano\QiCardPayment\Contracts\PaymentGateway;
-use TheJano\QiCardPayment\Data\BrowserInfo;
-use TheJano\QiCardPayment\Data\CustomerInfo;
+use TheJano\QiCardPayment\Data\CreatePaymentParams;
 use TheJano\QiCardPayment\Data\QiCardPaymentResponse;
 use TheJano\QiCardPayment\Data\QiCardRefundResponse;
 
@@ -35,22 +34,9 @@ class QiCardPayment implements PaymentGateway
         return self::$instance;
     }
 
-    public function createPayment(
-        string $requestId,
-        float $amount,
-        ?string $currency = null,
-        ?CustomerInfo $customerInfo = null,
-        ?BrowserInfo $browserInfo = null,
-        ?array $additionalInfo = null
-    ): QiCardPaymentResponse {
-        $requestData = $this->buildPaymentRequestData(
-            $requestId,
-            $amount,
-            $currency,
-            $customerInfo,
-            $browserInfo,
-            $additionalInfo
-        );
+    public function createPayment(CreatePaymentParams $params): QiCardPaymentResponse
+    {
+        $requestData = $params->toArray();
 
         $response = Http::withBasicAuth($this->username, $this->password)
             ->withHeaders([
@@ -110,37 +96,5 @@ class QiCardPayment implements PaymentGateway
             ->post("{$this->baseUrl}/payment/{$paymentId}/refund", $requestData);
 
         return new QiCardRefundResponse($response->json());
-    }
-
-    protected function buildPaymentRequestData(
-        string $requestId,
-        float $amount,
-        ?string $currency,
-        ?CustomerInfo $customerInfo,
-        ?BrowserInfo $browserInfo,
-        ?array $additionalInfo
-    ): array {
-        $data = [
-            'requestId' => $requestId,
-            'amount' => $amount,
-            'currency' => $currency ?? config('qicard.currency'),
-            'locale' => config('qicard.locale'),
-            'finishPaymentUrl' => config('qicard.finish_url'),
-            'notificationUrl' => config('qicard.notification_url'),
-        ];
-
-        if ($customerInfo !== null) {
-            $data['customerInfo'] = $customerInfo->toApiArray();
-        }
-
-        if ($browserInfo !== null) {
-            $data['browserInfo'] = $browserInfo->toApiArray();
-        }
-
-        if ($additionalInfo !== null) {
-            $data['additionalInfo'] = $additionalInfo;
-        }
-
-        return $data;
     }
 }

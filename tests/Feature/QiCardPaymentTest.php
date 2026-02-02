@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Http;
 use TheJano\QiCardPayment\Services\QiCardPayment;
 use TheJano\QiCardPayment\Data\CustomerInfo;
 use TheJano\QiCardPayment\Data\BrowserInfo;
+use TheJano\QiCardPayment\Data\CreatePaymentParams;
 
 beforeEach(function () {
     // Reset the singleton for each test
@@ -27,11 +28,12 @@ test('it creates payment successfully', function () {
         ], 200),
     ]);
 
-    $response = QiCardPayment::make()->createPayment(
-        'test-request-id',
-        256.89,
-        'IQD'
-    );
+    $params = (new CreatePaymentParams())
+        ->setRequestId('test-request-id')
+        ->setAmount(256.89)
+        ->setCurrency('IQD');
+
+    $response = QiCardPayment::make()->createPayment($params);
 
     expect($response->isSuccessful())->toBeTrue()
         ->and($response->paymentId)->toBe('f2bb43a8-488a-4281-977b-5b3418fc3c67')
@@ -67,12 +69,13 @@ test('it creates payment with customer info', function () {
         'email' => 'john@example.com',
     ]);
 
-    $response = QiCardPayment::make()->createPayment(
-        'test-request-id',
-        50000,
-        'IQD',
-        $customerInfo
-    );
+    $params = (new CreatePaymentParams())
+        ->setRequestId('test-request-id')
+        ->setAmount(50000)
+        ->setCurrency('IQD')
+        ->setCustomerInfo($customerInfo);
+
+    $response = QiCardPayment::make()->createPayment($params);
 
     expect($response->isSuccessful())->toBeTrue();
 
@@ -98,13 +101,15 @@ test('it creates payment with browser info', function () {
         'browserUserAgent' => 'Mozilla/5.0',
     ]);
 
-    $response = QiCardPayment::make()->createPayment(
-        'test-request-id',
-        50000,
-        'IQD',
-        null,
-        $browserInfo
-    );
+    $params = (new CreatePaymentParams())
+        ->setRequestId('test-request-id')
+        ->setAmount(50000)
+        ->setCurrency('IQD')
+        ->setBrowserInfo($browserInfo);
+
+
+
+    $response = QiCardPayment::make()->createPayment($params);
 
     expect($response->isSuccessful())->toBeTrue();
 
@@ -228,11 +233,11 @@ test('it handles error response from api', function () {
             ],
         ], 400),
     ]);
+    $params = (new CreatePaymentParams())
+        ->setRequestId('test-request-id')
+        ->setAmount(256.89);
 
-    $response = QiCardPayment::make()->createPayment(
-        'test-request-id',
-        256.89
-    );
+    $response = QiCardPayment::make()->createPayment($params);
 
     expect($response->isSuccessful())->toBeFalse()
         ->and($response->errorCode)->toBe(18)
@@ -247,7 +252,11 @@ test('it sends correct authentication headers', function () {
         ], 200),
     ]);
 
-    QiCardPayment::make()->createPayment('test-request-id', 100);
+    $params = (new CreatePaymentParams())
+        ->setRequestId('test-request-id')
+        ->setAmount(100);
+
+    QiCardPayment::make()->createPayment($params);
 
     Http::assertSent(function ($request) {
         return $request->hasHeader('Authorization')
