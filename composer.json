@@ -1,0 +1,50 @@
+{
+    "name": "thejano/qicard-payment-laravel",
+    "description": "A Laravel package for QiCard payment gateway integration.",
+    "version": "1.0.0",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dr. Pshtiwan Mahmood",
+            "email": "pshtiwan@thejano.com",
+            "homepage": "https://thejano.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "guzzlehttp/guzzle": "^7.0",
+        "illuminate/support": "^10.0|^11.0|^12.0"
+    },
+    "require-dev": {
+        "pestphp/pest": "^2.0|^3.0",
+        "pestphp/pest-plugin-laravel": "^2.0|^3.0",
+        "orchestra/testbench": "^8.0|^9.0|^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "TheJano\\QiCardPayment\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TheJano\\QiCardPayment\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TheJano\\QiCardPayment\\Providers\\QiCardPaymentServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "scripts": {
+        "test": "pest"
+    },
+    "minimum-stability": "stable"
+}
