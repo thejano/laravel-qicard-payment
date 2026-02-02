@@ -1,5 +1,7 @@
 # QiCard Payment Laravel Package
 
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/thejano/laravel-qicard-payment.svg)](https://packagist.org/packages/thejano/laravel-qicard-payment)
+[![Total Downloads](https://img.shields.io/packagist/dt/thejano/laravel-qicard-payment.svg)](https://packagist.org/packages/thejano/laravel-qicard-payment)
 [![Tests](https://github.com/thejano/laravel-qicard-payment/actions/workflows/tests.yml/badge.svg)](https://github.com/thejano/laravel-qicard-payment/actions/workflows/tests.yml)
 [![PHP Version](https://img.shields.io/badge/php-%3E%3D8.2-8892BF.svg)](https://php.net/)
 [![Laravel Version](https://img.shields.io/badge/laravel-10.x%20%7C%2011.x%20%7C%2012.x-FF2D20.svg)](https://laravel.com)
@@ -20,7 +22,7 @@ A Laravel package for integrating with QiCard Payment Gateway.
 Install the package via Composer:
 
 ```sh
-composer require thejano/qicard-payment-laravel
+composer require thejano/laravel-qicard-payment
 ```
 
 ## Configuration

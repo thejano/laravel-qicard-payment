@@ -1,5 +1,5 @@
 {
-    "name": "thejano/qicard-payment-laravel",
+    "name": "thejano/laravel-qicard-payment",
     "description": "A Laravel package for QiCard payment gateway integration.",
     "version": "1.0.0",
     "type": "library",
