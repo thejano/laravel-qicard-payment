@@ -227,7 +227,7 @@ When a request fails, the response contains an `error` object:
 
 **Dr. Pshtiwan Mahmood**
 
-- GitHub: [@pshiwanmahmood](https://github.com/pshiwanmahmood)
+- GitHub: [@drpshtiwan](https://github.com/drpshtiwan)
 - Website: [thejano.com](https://thejano.com)
 
 ## License
