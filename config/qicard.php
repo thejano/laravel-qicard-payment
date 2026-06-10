@@ -83,4 +83,16 @@ return [
 
     'notification_url' => env('QICARD_NOTIFICATION_URL', ''),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Public Key for Webhook Verification
+    |--------------------------------------------------------------------------
+    |
+    | The RSA public key provided by QiCard, used to verify the X-Signature 
+    | header on incoming webhook requests.
+    |
+    */
+
+    'public_key' => env('QICARD_PUBLIC_KEY', ''),
+
 ];

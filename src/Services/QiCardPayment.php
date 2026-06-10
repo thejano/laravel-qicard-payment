@@ -41,7 +41,8 @@ class QiCardPayment implements PaymentGateway
         ?string $currency = null,
         ?CustomerInfo $customerInfo = null,
         ?BrowserInfo $browserInfo = null,
-        ?array $additionalInfo = null
+        ?array $additionalInfo = null,
+        bool $appChannel = false
     ): QiCardPaymentResponse {
         $requestData = $this->buildPaymentRequestData(
             $requestId,
@@ -49,7 +50,8 @@ class QiCardPayment implements PaymentGateway
             $currency,
             $customerInfo,
             $browserInfo,
-            $additionalInfo
+            $additionalInfo,
+            $appChannel
         );
 
         $response = Http::withBasicAuth($this->username, $this->password)
@@ -112,13 +114,20 @@ class QiCardPayment implements PaymentGateway
         return new QiCardRefundResponse($response->json());
     }
 
+    public function verifyWebhookSignature(array $payload, string $signature): bool
+    {
+        $publicKey = config('qicard.public_key');
+        return \TheJano\QiCardPayment\Helpers\WebhookVerifier::verify($payload, $signature, $publicKey);
+    }
+
     protected function buildPaymentRequestData(
         string $requestId,
         float $amount,
         ?string $currency,
         ?CustomerInfo $customerInfo,
         ?BrowserInfo $browserInfo,
-        ?array $additionalInfo
+        ?array $additionalInfo,
+        bool $appChannel
     ): array {
         $data = [
             'requestId' => $requestId,
@@ -127,6 +136,7 @@ class QiCardPayment implements PaymentGateway
             'locale' => config('qicard.locale'),
             'finishPaymentUrl' => config('qicard.finish_url'),
             'notificationUrl' => config('qicard.notification_url'),
+            'appChannel' => $appChannel,
         ];
 
         if ($customerInfo !== null) {
