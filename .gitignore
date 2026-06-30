@@ -13,3 +13,5 @@ composer.lock
 *.cache
 coverage/
 .php-cs-fixer.cache
+CLAUDE.md
+.claude/

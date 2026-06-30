@@ -1,4 +1,4 @@
-name: Tests
+name: tests
 
 on:
   push:
@@ -11,13 +11,36 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        php: [8.2, 8.3, 8.4]
-        laravel: [10.*, 11.*, 12.*]
-        exclude:
-          - php: 8.4
-            laravel: 10.*
+        include:
+          - php: '8.2'
+            laravel: '10.*'
+            testbench: '8.*'
+          - php: '8.3'
+            laravel: '10.*'
+            testbench: '8.*'
+          - php: '8.2'
+            laravel: '11.*'
+            testbench: '9.*'
+          - php: '8.3'
+            laravel: '11.*'
+            testbench: '9.*'
+          - php: '8.2'
+            laravel: '12.*'
+            testbench: '10.*'
+          - php: '8.3'
+            laravel: '12.*'
+            testbench: '10.*'
+          - php: '8.4'
+            laravel: '12.*'
+            testbench: '10.*'
+          - php: '8.3'
+            laravel: '13.*'
+            testbench: '11.*'
+          - php: '8.4'
+            laravel: '13.*'
+            testbench: '11.*'
 
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
 
@@ -29,13 +52,18 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: mbstring, json
+          extensions: curl, json, mbstring
           coverage: none
 
       - name: Install dependencies
         run: |
-          composer require "illuminate/support:${{ matrix.laravel }}" --no-interaction --no-update
-          composer update --prefer-dist --no-interaction --no-progress
+          # CI installs are ephemeral and only run the test suite; allow the
+          # resolver to pick framework versions that may carry advisories.
+          composer config audit.block-insecure false
+          composer update \
+            --with="illuminate/support:${{ matrix.laravel }}" \
+            --with="orchestra/testbench:${{ matrix.testbench }}" \
+            --prefer-dist --prefer-stable --no-audit --no-interaction
 
       - name: Run tests
         run: vendor/bin/pest
