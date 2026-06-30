@@ -46,6 +46,7 @@ QICARD_CURRENCY=IQD
 QICARD_LOCALE=en_US
 QICARD_FINISH_URL=https://yourapp.com/payment/finish
 QICARD_NOTIFICATION_URL=https://yourapp.com/payment/notification
+QICARD_PUBLIC_KEY="-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----"
 ```
 
 ## Usage
@@ -57,7 +58,21 @@ use TheJano\QiCardPayment\Services\QiCardPayment;
 use TheJano\QiCardPayment\Helpers\TransactionHelper;
 
 $requestId = TransactionHelper::generateRequestId();
+
+// Basic payment
 $paymentData = QiCardPayment::make()->createPayment($requestId, 50000);
+
+// For mobile applications, you can enable appChannel by passing true as the 7th parameter
+$isMobileApp = true;
+$mobilePaymentData = QiCardPayment::make()->createPayment(
+    $requestId,
+    50000,
+    null, // currency
+    null, // customerInfo
+    null, // browserInfo
+    null, // additionalInfo
+    $isMobileApp // appChannel
+);
 
 if ($paymentData->isSuccessful()) {
     return redirect($paymentData->getPaymentUrl());
@@ -132,6 +147,30 @@ $refundResponse = QiCardPayment::refundPayment('payment-id', $requestId, 25000);
 
 if ($refundResponse->isSuccessful()) {
     // Refund processed successfully
+}
+```
+
+### Webhook Verification
+
+QiCard sends an asynchronous notification to your `notificationUrl` with an `X-Signature` header. You **must** verify this signature to ensure the webhook is authentic.
+
+```php
+use TheJano\QiCardPayment\Facades\QiCardPayment;
+use Illuminate\Http\Request;
+
+public function handleWebhook(Request $request)
+{
+    $payload = $request->all();
+    $signature = $request->header('X-Signature');
+
+    // Verify the signature using the configured QICARD_PUBLIC_KEY
+    if (!QiCardPayment::verifyWebhookSignature($payload, $signature)) {
+        abort(403, 'Invalid signature');
+    }
+
+    // Process the verified webhook (e.g., check $payload['status'])
+    
+    return response()->json(['status' => 'OK'], 200);
 }
 ```
 
@@ -223,12 +262,15 @@ When a request fails, the response contains an `error` object:
 |------|---------|-------------|
 | `18` | `INCORRECT_TRANSFER_STATE` | Payment is not in the correct state for the requested operation |
 
-## Author
+## Authors
 
 **Dr. Pshtiwan Mahmood**
-
 - GitHub: [@drpshtiwan](https://github.com/drpshtiwan)
 - Website: [thejano.com](https://thejano.com)
+
+**Nizam Omer**
+- GitHub: [@nizaamomer](https://github.com/nizaamomer)
+- Website: [nizaamomer.com](https://nizaamomer.com)
 
 ## License
 
